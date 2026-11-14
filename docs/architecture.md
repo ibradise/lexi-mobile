@@ -160,6 +160,11 @@ AppFailure (sealed, implements Exception)
 
 ## API Integration
 
+> Endpoint-level request and response details live in
+> [`docs/api-contract.md`](api-contract.md). That file is canonical for payloads,
+> status codes, limits, and error codes. This section covers mobile integration
+> patterns only.
+
 - Production base URL: `https://lexi-backend-z0zy.onrender.com/api`
 - Override with `--dart-define=API_BASE_URL=...`
 - Android emulator: `http://10.0.2.2:3001/api`
