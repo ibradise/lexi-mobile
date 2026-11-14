@@ -1,5 +1,7 @@
 # Lexi Mobile
 
+[![Flutter CI](https://github.com/ibradise/lexi-mobile/actions/workflows/flutter-ci.yml/badge.svg)](https://github.com/ibradise/lexi-mobile/actions/workflows/flutter-ci.yml)
+
 Flutter client for Lexi, a personal vocabulary learning app.
 
 ## Project Docs
