@@ -21,14 +21,15 @@ Lexi mobile app — Flutter application for the Lexi vocabulary learning app.
 4. Read `docs/tasks.md` — what's next
 5. Read `docs/architecture.md` — current code structure
 6. Read `docs/api-contract.md` — exact backend request/response contract
+7. Read `docs/screens.md` — screen behavior and navigation
 
 ### After Building
-7. Update `docs/IMPLEMENTATION.md` — what was actually built
-8. Update `docs/architecture.md` — if code structure changed
-9. Update `docs/api-contract.md` — if the backend contract changed
-10. **STOP and ask the user** for approval before clearing `docs/tasks.md`
-11. After approval, clear `docs/tasks.md`
-12. Commit only if this repository has been initialized with git
+8. Update `docs/IMPLEMENTATION.md` — what was actually built
+9. Update `docs/architecture.md` — if code structure changed
+10. Update `docs/api-contract.md` — if the backend contract changed
+11. **STOP and ask the user** for approval before clearing `docs/tasks.md`
+12. After approval, clear `docs/tasks.md`
+13. Commit only if this repository has been initialized with git
 
 **DO NOT** clear `docs/tasks.md` automatically or immediately.
 **ALWAYS** wait for explicit user approval before clearing.

@@ -255,6 +255,22 @@ Rules:
 
 ---
 
+## Screens
+
+Screen behavior, navigation, and endpoint usage live in
+[`docs/screens.md`](screens.md).
+
+| Screen | Primary endpoints |
+|--------|-------------------|
+| Home / Dashboard | `GET /api/dashboard` |
+| Add Words | `POST /api/vocabulary` |
+| Vocabulary Library | `GET /api/vocabulary` |
+| Word Detail | `GET /api/vocabulary/:id`, `DELETE /api/vocabulary/:id`, `POST /api/vocabulary/:id/regenerate-ai` |
+| Review Session | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
+| Review History | `GET /api/review/history` |
+
+---
+
 ## Navigation
 
 Navigation uses Flutter's built-in `Navigator` with centralized named routes.
