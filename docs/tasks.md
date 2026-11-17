@@ -1,72 +1,83 @@
 # Lexi Mobile — Implementation Tasks
 
-> Current phase only. See `docs/architecture.md` for the approved architecture.
+> Current phase only. See `docs/architecture.md` for the approved architecture,
+> `docs/api-contract.md` for endpoint payloads, and `docs/screens.md` for screen
+> behavior.
 
 ---
 
-## Phase 1: Project Setup
+## Phase 2: Add Words
 
-### Dependencies
+**Scope:** Single and bulk word entry. Keep the home route as a minimal landing
+screen with an Add Words CTA. Show AI ready/pending results; do not poll here.
+No new dependencies.
 
-- [x] Add latest stable runtime dependencies: `flutter_bloc`, `equatable`, `get_it`, `http`
-- [x] Add latest stable dev dependencies: `bloc_test`, `mocktail`
-- [x] Remove the default counter app code and test
+### Domain
 
-### Structure
+- [ ] Add `VocabularyWord` entity with `id`, `word`, and `aiReady`
+- [ ] Add `AddedWord` and `BulkAddResult` entities
+- [ ] Add `AddWordParams` with word, context, source title, and source URL
+- [ ] Add `VocabularyRepository` interface with `addWord` and `addWords`
+- [ ] Add `AddWord` use case that trims input and delegates to the repository
+- [ ] Add `AddWords` use case that trims pasted input and delegates to the repository
 
-- [x] Create the global-layer folder structure:
-  - `lib/core/config/`
-  - `lib/core/di/`
-  - `lib/core/network/`
-  - `lib/core/error/`
-  - `lib/core/utils/`
-  - `lib/data/datasources/`
-  - `lib/data/models/`
-  - `lib/data/repositories/`
-  - `lib/domain/entities/`
-  - `lib/domain/repositories/`
-  - `lib/domain/usecases/`
-  - `lib/presentation/bloc/`
-  - `lib/presentation/pages/`
-  - `lib/presentation/widgets/`
-  - `lib/presentation/navigation/`
+### Data
 
-### Foundation
+- [ ] Add `VocabularyWordModel` with parsing for ready and pending AI responses
+- [ ] Add `AddedWordModel` and `BulkAddResultModel`
+- [ ] Add `VocabularyRemoteDataSource` for `POST /vocabulary` single and bulk requests
+- [ ] Send only non-null optional fields in the single-word body
+- [ ] Use the 60-second AI timeout for single add and the standard timeout for bulk
+- [ ] Add `VocabularyRepositoryImpl` with model-to-entity mapping
+- [ ] Translate data-layer exceptions to `AppFailure` through the existing mapper
+- [ ] Register the data source, repository, use cases, and bloc factory in GetIt
 
-- [x] Add `AppConfig` with production API base URL, `API_BASE_URL` `--dart-define` override, and standard/AI timeout constants
-- [x] Implement the sealed `AppFailure` hierarchy
-- [x] Implement `ApiClient` with JSON envelope parsing, pagination meta, per-request timeouts, and data-layer exceptions
-- [x] Implement the data-layer exception to `AppFailure` mapper
-- [x] Add the domain `PaginatedResult<T>` wrapper
-- [x] Set up manual GetIt registrations for `http.Client`, `ApiClient`, and future layers
-- [x] Add a debug logger utility for unexpected exceptions
-- [x] Replace the counter screen with the Lexi app shell and light-first theme in `lib/core/config/app_theme.dart` (off-white background `#F7F6F2`, purple accent `#6C63FF`, dark text)
-- [x] Set up built-in `Navigator` with centralized named routes in `presentation/navigation/` and `onGenerateRoute` for typed arguments
+### Presentation
 
-### Platform
-
-- [x] Add the Android `INTERNET` permission to the main manifest
-- [x] Allow cleartext HTTP in the debug manifest for local API development only
+- [ ] Replace the placeholder page with a minimal `HomePage` and an Add Words CTA
+- [ ] Add `AppRoutes.addWord` and register it in `AppRouter`
+- [ ] Add `AddWordBloc` events: single submit, bulk submit, reset
+- [ ] Add states: idle, submitting, single success, bulk success, failure
+- [ ] Add the Add Words screen with a single/bulk mode switch
+- [ ] Single form: word, context, source title, source URL
+- [ ] Bulk form: multiline paste field
+- [ ] Validate required word and 100-character limit locally
+- [ ] Validate non-empty bulk input locally
+- [ ] Show loading and disable submit while a request is in flight
+- [ ] Show single success with AI ready or pending status
+- [ ] Show bulk summary with added, duplicate, and invalid counts
+- [ ] Show duplicate, validation, and network errors with retry
+- [ ] Add an "Add another" action that resets the form and bloc
+- [ ] Use theme values only; no hardcoded colors
 
 ### Tests
 
-- [x] Test `ApiClient`: success envelope, error envelope, non-2xx response, malformed JSON, timeout, and request construction
-- [x] Test the exception-to-failure mapper for every mapped backend code
-- [x] Replace the default widget test with an app shell smoke test
+- [ ] Test single-word model mapping for ready and pending responses
+- [ ] Test bulk result model mapping
+- [ ] Test data source paths, request bodies, omitted nulls, and timeouts
+- [ ] Test repository entity mapping and failure translation
+- [ ] Test use case trimming and repository delegation
+- [ ] Test bloc single success, pending, duplicate, bulk success, and failure
+- [ ] Test form validation, mode switching, success, and error rendering
+- [ ] Update the app shell test for the new home CTA
 
 ### Documentation
 
-- [x] Update `docs/architecture.md` if the implementation differs from the approved design
-- [x] Append the completed setup work to `docs/IMPLEMENTATION.md`
+- [ ] Append the Phase 2 entry to `docs/IMPLEMENTATION.md`
+- [ ] Correct the stale Phase 1 note that says no git repository was initialized
+- [ ] Update `docs/architecture.md` if the code structure changed
+- [ ] Update `docs/screens.md` if implemented behavior differs
+- [ ] Update `docs/api-contract.md` if the backend contract changed
 
 ### Verification
 
-- [x] `flutter analyze` passes with no issues
-- [x] `flutter test` passes
-- [x] `flutter build apk --debug` succeeds
-- [x] App launches with the production API configuration
+- [ ] `dart format --output=none --set-exit-if-changed lib test`
+- [ ] `flutter analyze` passes with no issues
+- [ ] `flutter test` passes
+- [ ] `flutter build apk --debug` succeeds
+- [ ] Push `feat/add-word-flow`, open a PR, and pass the `Analyze, test, and build` check
 
 ---
 
-Do not start the next phase, clear this file, or commit until the user approves the
-completed setup.
+Do not start Phase 3 or clear this file until the user approves the completed
+Phase 2 work.
