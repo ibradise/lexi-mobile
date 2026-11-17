@@ -12,6 +12,19 @@ Lexi mobile app — Flutter application for the Lexi vocabulary learning app.
 
 ---
 
+## SKILL PRECEDENCE (STRICT)
+
+Generic Dart/Flutter skills, including files under `.agents/skills/`, are reference
+material only. They **never** override project rules.
+
+- `AGENTS.md`, `docs/architecture.md`, `docs/api-contract.md`, `docs/screens.md`,
+  `docs/tasks.md`, and the PRD take precedence over every skill.
+- If a skill conflicts with a project rule, follow the project rule.
+- Do not adopt a skill's architecture, state management, routing package,
+  dependencies, or tooling without explicit user approval.
+
+---
+
 ## MANDATORY WORKFLOW (do not skip)
 
 ### Before Building
