@@ -17,6 +17,9 @@ Home / Dashboard
 
 **Purpose:** Overview of progress and today's review load.
 
+**Current implementation:** Phase 2 renders a minimal landing screen with an Add
+Words CTA. Dashboard content is planned.
+
 **Endpoints:** `GET /api/dashboard`
 
 **Content:**
@@ -51,6 +54,7 @@ Home / Dashboard
 **Rules:**
 - Word is required and limited to 100 characters.
 - Bulk input must not be empty; the backend enforces the 50-word limit.
+- Source URL is accepted as free text and is not validated locally.
 - AI polling happens in Library/Detail, not here.
 
 ## 3. Vocabulary Library
