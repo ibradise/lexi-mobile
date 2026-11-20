@@ -88,6 +88,7 @@ void main() {
     expect(find.byKey(const Key('mainDashboardTab')), findsOneWidget);
     expect(find.byKey(const Key('mainLibraryTab')), findsOneWidget);
     expect(find.byKey(const Key('mainReviewTab')), findsOneWidget);
+    expect(find.byKey(const Key('mainHistoryTab')), findsOneWidget);
     expect(find.byKey(const Key('mainAddWordButton')), findsOneWidget);
   });
 
@@ -118,6 +119,19 @@ void main() {
 
     expect(find.text("You're all caught up"), findsOneWidget);
     expect(find.byKey(const Key('reviewStartButton')), findsNothing);
+  });
+
+  testWidgets('opens the history tab and shows the empty state', (
+    tester,
+  ) async {
+    configureWithEmptyLibrary();
+    await tester.pumpWidget(const LexiApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('mainHistoryTab')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No reviews yet'), findsOneWidget);
   });
 
   testWidgets('opens the add words screen from the shell', (tester) async {

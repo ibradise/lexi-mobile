@@ -8,19 +8,21 @@
 ```
 Main shell (bottom navigation)
 ├── Dashboard (default tab)
-└── Library → Word Detail
+├── Library → Word Detail
+├── Review → Review Session
+└── History
 
 Add Words is a pushed route opened from the shell-level Add word FAB.
-Review Session and Review History become additional tabs in later phases.
+Review Session opens full-screen without the bottom navigation bar.
 ```
 
 ## 1. Home / Dashboard
 
 **Purpose:** Overview of progress and today's review load.
 
-**Current implementation:** The default tab inside `MainShellPage`. Renders a dashboard
-placeholder with empty-activity guidance, a persistent bottom navigation bar for
-Dashboard and Library, and a shell-level Add word FAB. Real dashboard data is planned.
+**Current implementation:** The default tab inside the four-tab `MainShellPage`.
+Loads today's review counts, progress stats, the learning mix, and up to five weakest
+words from `GET /api/dashboard`. The empty-library state links to Add Words.
 
 **Endpoints:** `GET /api/dashboard`
 
@@ -29,8 +31,8 @@ Dashboard and Library, and a shell-level Add word FAB. Real dashboard data is pl
 - Stats: total words, status counts, reviews today, 7-day accuracy, streak
 - Up to 5 weakest words
 
-**Actions:** Add words from the FAB; switch to Library from the bottom navigation.
-Start review and review history become available in later phases.
+**Actions:** Start review when words are due, add words from the FAB or empty state,
+open a weakest word in Word Detail, refresh, and switch tabs.
 
 **States:** Loading; error with retry; empty library with an add-word CTA; populated.
 
@@ -111,9 +113,16 @@ recent reviews, bounded pending-AI polling, regenerate, and soft delete.
 AI polls at 3s, 6s, 12s, 20s, and 30s, then stops. Source URLs are selectable text,
 not external links.
 
-## 5. Review Session
+## 5. Review
 
-**Purpose:** Review today's queue one exercise at a time.
+**Purpose:** Start and complete today's review queue.
+
+**Current implementation:** The Review tab lists today's counts and queue, including
+AI-pending items. Tapping Start review opens the full-screen Review Session. The
+session skips AI-pending words, shows one exercise per word, submits answers to the
+server, shows feedback, and finishes with a summary. Completing or closing a session
+refreshes the Review tab. The API returns up to three exercises per word; this first
+version uses the first exercise for each queue word.
 
 **Endpoints:**
 - `GET /api/review/today`
@@ -139,6 +148,11 @@ not external links.
 
 **Purpose:** Browse past review activity.
 
+**Current implementation:** The History tab loads the newest-first paginated review
+list (20 per page), shows result badges and timing/hint details, supports Load more,
+refreshes, and opens the reviewed word in Word Detail. The data layer and query support
+an optional `wordId` filter; no filter entry point is exposed yet.
+
 **Endpoints:** `GET /api/review/history`
 
 **Content:**
@@ -146,7 +160,7 @@ not external links.
 - Optional word filter
 - Pagination
 
-**Actions:** Paginate, filter by word, open Word Detail.
+**Actions:** Refresh, load more, and open Word Detail. Word filtering is supported by the data layer but not yet exposed in the UI.
 
 **States:** Loading; empty; error with retry; populated.
 

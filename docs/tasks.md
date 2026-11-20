@@ -89,5 +89,69 @@
 
 ---
 
-Phase 3 implementation and verification are complete and approved. This file can be
-cleared when the next phase begins.
+Phase 3 implementation and verification are complete and approved. Phase 4 begins
+below; Phase 3 stays here until the next approved cleanup.
+
+
+## Phase 4: Review, Dashboard, and History
+
+> Scope: complete the four-tab MVP shell. All MVP screens are implemented; polish
+> and live-backend verification remain. No new proposal is required because these screens are in
+> the approved MVP scope.
+
+### Review
+
+- [x] Add `ReviewQueue`, `ReviewExercise`, `ReviewSubmission`, `ScoreBreakdown`, and `ReviewSubmissionResult` entities.
+- [x] Add `ReviewRepository` plus `GetTodayReview`, `GetReviewExercises`, and `SubmitReview` use cases.
+- [x] Add review queue, exercise, and submission-result models.
+- [x] Add `ReviewRemoteDataSource` for today's queue, exercises, and submit endpoints.
+- [x] Add `ReviewRepositoryImpl` with model mapping and `AppFailure` translation.
+- [x] Handle exercise `AI_NOT_READY` (`409`) as a skipped word, not a hard failure.
+- [x] Add `ReviewQueueBloc` with load, retry, and start-session events.
+- [x] Add `ReviewSessionBloc` with start, answer, skip, retry, progress, counts, and completion.
+- [x] Add `ReviewPage` with due/new/attention counts, pending-AI notice, queue preview, start action, and states.
+- [x] Add full-screen `ReviewSessionPage` with multiple-choice options, feedback, skip, exit confirmation, and completion summary.
+- [x] Use one exercise per word for the first version.
+- [x] Refresh the Review tab after a session completes or is closed.
+
+### Four-tab shell
+
+- [x] Expand `MainShellPage` to Dashboard, Library, Review, and History.
+- [x] Load the review queue lazily when the Review tab is first selected.
+- [x] Keep the shell-level Add word FAB on shell tabs.
+- [x] Keep Review Session outside the shell with no bottom navigation.
+- [x] Add `/review`, `/history`, and `/review-session` routes.
+- [x] Add a Review History placeholder UI until the history slice.
+- [x] Register review data sources, repository, use cases, and bloc factories in GetIt.
+
+### Dashboard
+
+- [x] Add dashboard entities and models for counts, stats, and weakest words.
+- [x] Add `DashboardRemoteDataSource`, repository method, use case, and `DashboardBloc`.
+- [x] Replace the dashboard placeholder with today's load, stats, and weakest words.
+- [x] Add a Start review action that opens `/review-session`.
+- [x] Add loading, error with retry, empty-library CTA, and populated states.
+- [x] Add dashboard model, data source, repository, use case, bloc, and widget tests.
+- [x] Open a weakest word in Word Detail and refresh after deletion.
+- [x] Refresh the dashboard after adding words or completing a review.
+
+### Review History
+
+- [x] Add review history entities, models, filtering, and pagination.
+- [x] Add the `GET /api/review/history` data source method, repository method, and use case.
+- [x] Replace the History placeholder with a paginated list and refresh action.
+- [x] Support an optional `wordId` query in the data layer and bloc; filter UI remains future polish.
+- [x] Open Word Detail from history rows.
+- [x] Add history model, data source, repository, use case, bloc, and widget tests.
+- [x] Load the history tab lazily and refresh it after review activity.
+
+### Tests and verification
+
+- [x] Run `dart format --output=none --set-exit-if-changed lib test`.
+- [x] Run `flutter analyze`.
+- [x] Run `flutter test --concurrency=1` — 164 tests pass.
+- [x] Run `flutter build apk --debug`.
+- [x] Verify four-tab navigation, review queue, session submission, and History placeholder in widget tests.
+- [x] Verify the Dashboard slice with unit and widget tests.
+- [x] Verify the Review History slice with unit and widget tests.
+- [ ] **STOP and ask for approval before clearing this file.**

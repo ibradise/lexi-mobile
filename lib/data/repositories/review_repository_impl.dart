@@ -1,5 +1,8 @@
 import '../../domain/entities/review_exercise.dart';
 import '../../domain/entities/review_queue.dart';
+import '../../domain/entities/paginated_result.dart';
+import '../../domain/entities/review_history_item.dart';
+import '../../domain/entities/review_history_query.dart';
 import '../../domain/entities/review_submission.dart';
 import '../../domain/entities/review_submission_result.dart';
 import '../../domain/repositories/review_repository.dart';
@@ -25,6 +28,18 @@ class ReviewRepositoryImpl implements ReviewRepository {
   Future<ReviewExerciseSet> getExercises(String wordId) async {
     try {
       final model = await _remoteDataSource.getExercises(wordId);
+      return model.toEntity();
+    } catch (error, stackTrace) {
+      throw mapExceptionToFailure(error, stackTrace);
+    }
+  }
+
+  @override
+  Future<PaginatedResult<ReviewHistoryItem>> getHistory(
+    ReviewHistoryQuery query,
+  ) async {
+    try {
+      final model = await _remoteDataSource.getHistory(query);
       return model.toEntity();
     } catch (error, stackTrace) {
       throw mapExceptionToFailure(error, stackTrace);

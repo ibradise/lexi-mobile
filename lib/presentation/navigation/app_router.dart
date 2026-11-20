@@ -6,6 +6,7 @@ import '../bloc/add_word_bloc.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
+import '../bloc/review_history_bloc.dart';
 import '../bloc/review_queue_bloc.dart';
 import '../bloc/review_session_bloc.dart';
 import '../bloc/review_session_event.dart';
@@ -26,6 +27,8 @@ abstract final class AppRouter {
         return _shellRoute(settings, initialIndex: 1);
       case AppRoutes.review:
         return _shellRoute(settings, initialIndex: 2);
+      case AppRoutes.reviewHistory:
+        return _shellRoute(settings, initialIndex: 3);
       case AppRoutes.reviewSession:
         return MaterialPageRoute<void>(
           builder: (_) => BlocProvider<ReviewSessionBloc>(
@@ -74,6 +77,9 @@ abstract final class AppRouter {
           ),
           BlocProvider<ReviewQueueBloc>(
             create: (_) => getIt<ReviewQueueBloc>(),
+          ),
+          BlocProvider<ReviewHistoryBloc>(
+            create: (_) => getIt<ReviewHistoryBloc>(),
           ),
         ],
         child: MainShellPage(initialIndex: initialIndex),

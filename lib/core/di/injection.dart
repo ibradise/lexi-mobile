@@ -16,6 +16,7 @@ import '../../domain/usecases/delete_word.dart';
 import '../../domain/usecases/get_dashboard.dart';
 import '../../domain/usecases/get_word_detail.dart';
 import '../../domain/usecases/get_review_exercises.dart';
+import '../../domain/usecases/get_review_history.dart';
 import '../../domain/usecases/get_today_review.dart';
 import '../../domain/usecases/get_words.dart';
 import '../../domain/usecases/regenerate_word_ai.dart';
@@ -23,6 +24,7 @@ import '../../domain/usecases/submit_review.dart';
 import '../../presentation/bloc/add_word_bloc.dart';
 import '../../presentation/bloc/dashboard_bloc.dart';
 import '../../presentation/bloc/library_bloc.dart';
+import '../../presentation/bloc/review_history_bloc.dart';
 import '../../presentation/bloc/review_queue_bloc.dart';
 import '../../presentation/bloc/review_session_bloc.dart';
 import '../../presentation/bloc/word_detail_bloc.dart';
@@ -87,6 +89,9 @@ void configureDependencies({http.Client? httpClient, String? baseUrl}) {
   getIt.registerLazySingleton<GetReviewExercises>(
     () => GetReviewExercises(getIt<ReviewRepository>()),
   );
+  getIt.registerLazySingleton<GetReviewHistory>(
+    () => GetReviewHistory(getIt<ReviewRepository>()),
+  );
   getIt.registerLazySingleton<SubmitReview>(
     () => SubmitReview(getIt<ReviewRepository>()),
   );
@@ -102,6 +107,9 @@ void configureDependencies({http.Client? httpClient, String? baseUrl}) {
     () => DashboardBloc(getIt<GetDashboard>()),
   );
   getIt.registerFactory<LibraryBloc>(() => LibraryBloc(getIt<GetWords>()));
+  getIt.registerFactory<ReviewHistoryBloc>(
+    () => ReviewHistoryBloc(getIt<GetReviewHistory>()),
+  );
   getIt.registerFactory<ReviewQueueBloc>(
     () => ReviewQueueBloc(getIt<GetTodayReview>()),
   );

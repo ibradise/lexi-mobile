@@ -178,3 +178,191 @@
 - Source URLs are selectable text; `url_launcher` is intentionally not added
 - Pending AI polling stops after the bounded schedule and exposes "Check again" and "Regenerate AI"
 - Phase 3 changes are committed on the feature branch and not yet pushed
+
+
+## 2026-11-20 — Phase 4: Review Flow
+
+- [x] Added review domain entities: queue, exercise, submission, score breakdown, and submission result
+- [x] Added `ReviewRepository` with today's queue, exercises, and submit operations
+- [x] Added `GetTodayReview`, `GetReviewExercises`, and `SubmitReview` use cases with id/answer validation
+- [x] Added review queue, exercise, and submission-result models plus `ReviewRemoteDataSource`
+- [x] Added `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, and `POST /api/review/:wordId/submit`
+- [x] Mapped review failures, including the explicit `AI_NOT_READY` (`409`) path
+- [x] Added `ReviewQueueBloc` for queue loading, retry, and start-session navigation state
+- [x] Added `ReviewSessionBloc` for one-exercise-per-word sessions, AI-pending skips, submit/skip, retry, counts, and completion
+- [x] Added `ReviewPage` with due/new/attention counts, pending-AI notice, queue preview, empty/error/retry states, and Start review
+- [x] Added full-screen `ReviewSessionPage` with options, submit/skip, feedback, progress, exit confirmation, and completion summary
+- [x] Expanded `MainShellPage` to Dashboard, Library, Review, and History tabs with lazy review loading and the Add word FAB
+- [x] Added `/review`, `/history`, and `/review-session` routes; Review Session is pushed outside the shell
+- [x] Added Review History placeholder inside the shell until its data slice
+- [x] Added model, data source, repository, use case, bloc, and widget tests
+- [x] Updated four-tab shell widget tests and the Review empty state
+
+## Screens Implemented (mobile)
+
+- Dashboard/Home — default tab with dashboard placeholder; real dashboard data is next
+- Vocabulary Library — search, status filters, sort, paginated word cards, and states
+- Word Detail — AI content, learning state, source, reviews, polling, regenerate, and delete
+- Review — today's queue with counts, start action, and AI-pending notice
+- Review Session — full-screen one-question flow with server feedback and completion summary
+- History — placeholder tab until the review history slice
+
+## API Integration
+
+- `GET /api/review/today`; 15-second timeout; queue is capped at 30 and omits AI content
+- `GET /api/vocabulary/:id/exercises`; 15-second timeout; requires AI-ready words
+- `POST /api/review/:wordId/submit`; 15-second timeout; server determines the result
+- `AI_NOT_READY` is surfaced as a skipped word with a pending count, not a hard session failure
+
+## Tests
+
+- Models: queue counts/items, exercises, submission results, score breakdown, and malformed payloads
+- Remote data source: queue, encoded exercise ids, submit body, omitted options, and `AI_NOT_READY`
+- Repository: queue/exercise/result mapping, submit delegation, and failure translation
+- Use cases: id/answer validation and delegation
+- `ReviewQueueBloc`: load, empty, failure, retry, start action, and disposed safety
+- `ReviewSessionBloc`: start, AI skips, answer, skip, retry after failure, completion, and empty queue
+- Widgets: Review tab states, start/session navigation, answer feedback, skip, completion, and History placeholder
+- Result: 129 tests pass
+
+## Verification
+
+- `dart format --output=none --set-exit-if-changed lib test` — no changes
+- `flutter analyze` — no issues
+- `flutter test --concurrency=1` — 129 tests pass
+- `flutter build apk --debug` — succeeded
+- Build output: `build/app/outputs/flutter-apk/app-debug.apk`
+- Review and dashboard flows are not yet verified against a live local backend in this session
+
+## Notes
+
+- No new dependencies were added
+- The four bottom tabs are Dashboard, Library, Review, and History
+- Review uses one exercise per word in this first version; the API returns up to three
+- AI-pending queue items are shown on the Review tab and skipped by the session
+- Submissions use a generated `submissionId` for idempotency and send server-authoritative answers
+- Review History is the remaining MVP screen
+- Phase 4 changes are not committed yet
+
+## 2026-11-20 — Phase 4: Dashboard
+
+- [x] Added `DashboardData`, today's review counts, weakest word, and stats entities
+- [x] Added `DashboardRepository` and the `GetDashboard` use case
+- [x] Added dashboard models for today's counts, weakest words, and progress stats
+- [x] Added `GET /api/dashboard` with the standard 15-second timeout
+- [x] Added `DashboardRepositoryImpl` mapping and `AppFailure` translation
+- [x] Added `DashboardBloc` with load, refresh, retry, and stale-request protection
+- [x] Replaced the dashboard placeholder with today's review card, Start review, progress stat cards, learning mix, and weakest words
+- [x] Added an empty-library dashboard state with an Add words CTA
+- [x] Added dashboard retry and refresh actions
+- [x] Wired the dashboard into the shell as the default tab with lazy loading
+- [x] Refreshed the dashboard after adding words, completing a review, and returning from a weakest word
+- [x] Opened weakest words in Word Detail and refreshed the dashboard after deletion
+- [x] Added dashboard model, data source, repository, use case, bloc, and widget tests
+- [x] Updated shell widget mocks for `GET /api/dashboard`
+
+## Screens Implemented (mobile)
+
+- Dashboard/Home — today's review counts, Start review, progress stats, learning mix, and weakest words
+- Vocabulary Library — search, status filters, sort, paginated word cards, and states
+- Word Detail — AI content, learning state, source, reviews, polling, regenerate, and delete
+- Review — today's queue with counts, start action, and AI-pending notice
+- Review Session — full-screen one-question flow with server feedback and completion summary
+- History — placeholder tab until the review history slice
+
+## API Integration
+
+- `GET /api/dashboard`; 15-second timeout; today's counts, stats, and up to five weakest words
+- `GET /api/review/today`; 15-second timeout; queue is capped at 30 and omits AI content
+- `GET /api/vocabulary/:id/exercises`; 15-second timeout; requires AI-ready words
+- `POST /api/review/:wordId/submit`; 15-second timeout; server determines the result
+- `AI_NOT_READY` is surfaced as a skipped word with a pending count, not a hard session failure
+
+## Tests
+
+- Dashboard models: counts, stats, weakest words, empty library, and malformed responses
+- Dashboard data source: path, malformed payload, and incomplete data
+- Dashboard repository and use case: mapping, delegation, and failure translation
+- `DashboardBloc`: load and failure
+- Dashboard widgets: populated content, Start review, weakest-word navigation, empty CTA, and retry
+- Result: 146 tests pass
+
+## Verification
+
+- `dart format --output=none --set-exit-if-changed lib test` — no changes
+- `flutter analyze` — no issues
+- `flutter test --concurrency=1` — 146 tests pass
+- `flutter build apk --debug` — succeeded
+- Build output: `build/app/outputs/flutter-apk/app-debug.apk`
+- Dashboard is not yet verified against a live local backend in this session
+
+## Notes
+
+- No new dependencies were added
+- Dashboard is loaded when the shell opens on the default tab; it is also refreshed after mutations
+- The dashboard uses the server's `new` field for the new-word count
+- Start review appears only when at least one word is due
+- Weakest words are capped by the backend at five
+- Review History is the remaining MVP screen
+- Phase 4 changes are not committed yet
+
+
+## 2026-11-20 — Phase 4: Review History
+
+- [x] Added `ReviewHistoryItem` and `ReviewHistoryQuery` with optional word filter and pagination
+- [x] Extended `ReviewRepository` with `getHistory`
+- [x] Added the `GetReviewHistory` use case with trimmed word ids and bounded pagination
+- [x] Added review history item and page models with the nested `word` relation
+- [x] Added `GET /api/review/history` with `wordId`, `page`, and `limit`
+- [x] Added `ReviewHistoryBloc` with load, refresh, load more, word filter, failure, and stale-request protection
+- [x] Replaced the History placeholder with a newest-first paginated list, result badges, timing/hint details, empty/error states, and Load more
+- [x] Loaded History lazily when the tab is selected and refreshed it after review activity
+- [x] Opened Word Detail from history rows and refreshed after deletion
+- [x] Added history model, data source, repository, use case, bloc, and widget tests
+- [x] Added a shell widget test for the empty History tab
+
+## Screens Implemented (mobile)
+
+- Dashboard/Home — today's review counts, Start review, progress stats, learning mix, and weakest words
+- Vocabulary Library — search, status filters, sort, paginated word cards, and states
+- Word Detail — AI content, learning state, source, reviews, polling, regenerate, and delete
+- Review — today's queue with counts, start action, and AI-pending notice
+- Review Session — full-screen one-question flow with server feedback and completion summary
+- Review History — paginated newest-first activity with result badges and word navigation
+
+## API Integration
+
+- `GET /api/dashboard`; 15-second timeout; today's counts, stats, and up to five weakest words
+- `GET /api/review/today`; 15-second timeout; queue is capped at 30 and omits AI content
+- `GET /api/vocabulary/:id/exercises`; 15-second timeout; requires AI-ready words
+- `POST /api/review/:wordId/submit`; 15-second timeout; server determines the result
+- `GET /api/review/history`; 15-second timeout; 20 per page with optional `wordId`
+- `AI_NOT_READY` is surfaced as a skipped word with a pending count, not a hard session failure
+
+## Tests
+
+- History models: nested word relation, results, timing, hints, and page mapping
+- History data source: optional word filter, page/limit, metadata, and missing-meta failure
+- History repository and use case: mapping, failure translation, trimming, and pagination bounds
+- `ReviewHistoryBloc`: first page, load more, word filter, and failure
+- History widgets: populated list, word navigation, empty state, and retry
+- Shell widgets: History tab opens the empty state
+- Result: 164 tests pass
+
+## Verification
+
+- `dart format --output=none --set-exit-if-changed lib test` — no changes
+- `flutter analyze` — no issues
+- `flutter test --concurrency=1` — 164 tests pass
+- `flutter build apk --debug` — succeeded
+- Build output: `build/app/outputs/flutter-apk/app-debug.apk`
+- All four tabs and all MVP screens are implemented; live-backend verification and visual polish remain
+
+## Notes
+
+- No new dependencies were added
+- All four bottom tabs are now functional: Dashboard, Library, Review, and History
+- Review History loads lazily and is refreshed after add/review/delete activity
+- The history data layer supports `wordId` filtering; the first UI version does not expose a filter control
+- Review History uses explicit Load more pagination with 20 items per page
+- Phase 4 changes are not committed yet

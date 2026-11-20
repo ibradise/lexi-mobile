@@ -1,8 +1,10 @@
 import '../../core/config/app_config.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_exception.dart';
+import '../../domain/entities/review_history_query.dart';
 import '../../domain/entities/review_submission.dart';
 import '../models/review_exercise_model.dart';
+import '../models/review_history_model.dart';
 import '../models/review_queue_model.dart';
 import '../models/review_submission_result_model.dart';
 
@@ -34,6 +36,43 @@ class ReviewRemoteDataSource {
     final data = _requireMap(response.data);
     try {
       return ReviewExerciseSetModel.fromJson(data);
+    } on FormatException catch (error) {
+      throw ApiException.parsing(details: error);
+    }
+  }
+
+  Future<ReviewHistoryPageModel> getHistory(ReviewHistoryQuery query) async {
+    final wordId = query.wordId?.trim();
+    final params = <String, dynamic>{'page': query.page, 'limit': query.limit};
+
+    if (wordId != null && wordId.isNotEmpty) {
+      params['wordId'] = wordId;
+    }
+
+    final response = await _apiClient.get(
+      '/review/history',
+      query: params,
+      timeout: AppConfig.requestTimeout,
+    );
+    final data = response.data;
+    final meta = response.meta;
+
+    if (data is! List || meta == null) {
+      throw const ApiException.parsing();
+    }
+
+    try {
+      return ReviewHistoryPageModel(
+        items: [
+          for (final item in data)
+            if (item is Map<String, dynamic>)
+              ReviewHistoryItemModel.fromJson(item),
+        ],
+        page: meta.page,
+        limit: meta.limit,
+        total: meta.total,
+        totalPages: meta.totalPages,
+      );
     } on FormatException catch (error) {
       throw ApiException.parsing(details: error);
     }

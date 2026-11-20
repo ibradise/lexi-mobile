@@ -6,11 +6,14 @@ import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
+import '../bloc/review_history_bloc.dart';
+import '../bloc/review_history_event.dart';
 import '../bloc/review_queue_bloc.dart';
 import '../bloc/review_queue_event.dart';
 import '../navigation/app_routes.dart';
 import 'home_page.dart';
 import 'library_page.dart';
+import 'review_history_page.dart';
 import 'review_page.dart';
 
 class MainShellPage extends StatefulWidget {
@@ -25,13 +28,14 @@ class MainShellPage extends StatefulWidget {
 class _MainShellPageState extends State<MainShellPage> {
   late int _selectedIndex;
   bool _dashboardRequested = false;
+  bool _reviewHistoryRequested = false;
   bool _reviewQueueRequested = false;
 
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget.initialIndex.clamp(0, 2);
-    if (_selectedIndex == 0 || _selectedIndex == 2) {
+    _selectedIndex = widget.initialIndex.clamp(0, 3);
+    if (_selectedIndex == 0 || _selectedIndex == 2 || _selectedIndex == 3) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
@@ -41,6 +45,8 @@ class _MainShellPageState extends State<MainShellPage> {
             _loadDashboard();
           case 2:
             _loadReviewQueue();
+          case 3:
+            _loadReviewHistory();
         }
       });
     }
@@ -72,6 +78,18 @@ class _MainShellPageState extends State<MainShellPage> {
     }
   }
 
+  void _loadReviewHistory() {
+    if (_reviewHistoryRequested) {
+      return;
+    }
+    _refreshReviewHistory();
+  }
+
+  void _refreshReviewHistory() {
+    _reviewHistoryRequested = true;
+    context.read<ReviewHistoryBloc>().add(const LoadReviewHistory());
+  }
+
   void _selectTab(int index) {
     if (index == _selectedIndex) {
       return;
@@ -82,6 +100,8 @@ class _MainShellPageState extends State<MainShellPage> {
         _loadDashboard();
       case 2:
         _loadReviewQueue();
+      case 3:
+        _loadReviewHistory();
     }
   }
 
@@ -93,6 +113,7 @@ class _MainShellPageState extends State<MainShellPage> {
     _refreshDashboard();
     context.read<LibraryBloc>().add(const LoadLibrary());
     _refreshReviewQueue();
+    _refreshReviewHistory();
   }
 
   Future<void> _startReview() async {
@@ -102,6 +123,7 @@ class _MainShellPageState extends State<MainShellPage> {
     }
     _refreshDashboard();
     _refreshReviewQueue();
+    _refreshReviewHistory();
   }
 
   Future<void> _openWeakestWord(WeakestWord word) async {
@@ -116,6 +138,7 @@ class _MainShellPageState extends State<MainShellPage> {
     _refreshDashboard();
     if (deleted == true) {
       context.read<LibraryBloc>().add(const LoadLibrary());
+      _refreshReviewHistory();
     }
   }
 
@@ -139,6 +162,7 @@ class _MainShellPageState extends State<MainShellPage> {
             ),
             const LibraryPage(),
             const ReviewPage(),
+            const ReviewHistoryPage(),
           ],
         ),
         bottomNavigationBar: NavigationBar(
@@ -162,6 +186,12 @@ class _MainShellPageState extends State<MainShellPage> {
               icon: Icon(Icons.quiz_outlined),
               selectedIcon: Icon(Icons.quiz),
               label: 'Review',
+            ),
+            NavigationDestination(
+              key: Key('mainHistoryTab'),
+              icon: Icon(Icons.history_outlined),
+              selectedIcon: Icon(Icons.history),
+              label: 'History',
             ),
           ],
         ),

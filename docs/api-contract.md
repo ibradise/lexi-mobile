@@ -95,13 +95,13 @@ Error:
 | Bulk add words | `POST /api/vocabulary` with `{ words: [...] }` | Phase 2 |
 | Library list / search / filter | `GET /api/vocabulary` | Phase 3 |
 | Word detail | `GET /api/vocabulary/:id` | Phase 3 |
-| Review exercises | `GET /api/vocabulary/:id/exercises` | Planned |
+| Review exercises | `GET /api/vocabulary/:id/exercises` | Phase 4 |
 | Delete word | `DELETE /api/vocabulary/:id` | Phase 3 |
 | Regenerate AI content | `POST /api/vocabulary/:id/regenerate-ai` | Phase 3 |
-| Today's review queue | `GET /api/review/today` | Planned |
-| Submit a review answer | `POST /api/review/:wordId/submit` | Planned |
-| Review history | `GET /api/review/history` | Planned |
-| Dashboard | `GET /api/dashboard` | Planned |
+| Today's review queue | `GET /api/review/today` | Phase 4 |
+| Submit a review answer | `POST /api/review/:wordId/submit` | Phase 4 |
+| Review history | `GET /api/review/history` | Phase 4 |
+| Dashboard | `GET /api/dashboard` | Phase 4 |
 | Health check | `GET /health` | Not used by the app |
 
 ---

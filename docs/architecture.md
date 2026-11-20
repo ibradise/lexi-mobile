@@ -68,15 +68,15 @@ can be reorganized later.
 
 ### Current implementation files
 
-- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`, `LearningStatus`, `LearningState`, `WordSummary`, `WordDetail`, `AiContent`, `WordMeaning`, `WordExample`, `ReviewEntry`, `VocabularyQuery`, `PaginatedResult`
-- `domain/repositories/vocabulary_repository.dart`: add, list, detail, delete, and regenerate-AI interface
-- `domain/usecases/`: `AddWord`, `AddWords`, `GetWords`, `GetWordDetail`, `DeleteWord`, `RegenerateWordAi`
-- `data/models/`: single-word, bulk-result, word summary/detail, learning state, AI content, review, and page models
-- `data/datasources/vocabulary_remote_data_source.dart`: vocabulary list, detail, delete, add, bulk add, and regenerate-AI endpoints
-- `data/repositories/vocabulary_repository_impl.dart`: mapping and failure translation
-- `presentation/bloc/`: `AddWordBloc`, `LibraryBloc`, and `WordDetailBloc` with event and state files
-- `presentation/pages/`: `main_shell_page.dart`, `home_page.dart`, `add_words_page.dart`, `library_page.dart`, `word_detail_page.dart`
-- `presentation/navigation/`: shell, `/add-word`, `/library`, and `/word-detail` routes
+- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`, `LearningStatus`, `LearningState`, `WordSummary`, `WordDetail`, `AiContent`, `WordMeaning`, `WordExample`, `ReviewEntry`, `VocabularyQuery`, `PaginatedResult`, `DashboardData`, `ReviewQueue`, `ReviewExercise`, `ReviewSubmission`, `ScoreBreakdown`, `ReviewSubmissionResult`, `ReviewHistoryItem`, `ReviewHistoryQuery`
+- `domain/repositories/`: `VocabularyRepository` for add/list/detail/delete/regenerate; `DashboardRepository` for dashboard data; `ReviewRepository` for today's queue, exercises, and submission
+- `domain/usecases/`: `AddWord`, `AddWords`, `GetWords`, `GetWordDetail`, `DeleteWord`, `RegenerateWordAi`, `GetDashboard`, `GetTodayReview`, `GetReviewExercises`, `GetReviewHistory`, `SubmitReview`
+- `data/models/`: single-word, bulk-result, word summary/detail, learning state, AI content, review, page, dashboard, review queue, review exercise, review history, and submission-result models
+- `data/datasources/`: `vocabulary_remote_data_source.dart` for vocabulary endpoints; `dashboard_remote_data_source.dart` for the dashboard; `review_remote_data_source.dart` for review queue, exercises, and submit
+- `data/repositories/`: `vocabulary_repository_impl.dart`, `dashboard_repository_impl.dart`, and `review_repository_impl.dart` for mapping and failure translation
+- `presentation/bloc/`: `AddWordBloc`, `DashboardBloc`, `LibraryBloc`, `WordDetailBloc`, `ReviewQueueBloc`, `ReviewSessionBloc`, and `ReviewHistoryBloc` with event and state files
+- `presentation/pages/`: `main_shell_page.dart`, `home_page.dart`, `add_words_page.dart`, `library_page.dart`, `word_detail_page.dart`, `review_page.dart`, `review_session_page.dart`, `review_history_page.dart`
+- `presentation/navigation/`: shell, `/add-word`, `/library`, `/review`, `/history`, `/review-session`, and `/word-detail` routes
 
 ---
 
@@ -278,12 +278,12 @@ Screen behavior, navigation, and endpoint usage live in
 | Add Words | `POST /api/vocabulary` |
 | Vocabulary Library | `GET /api/vocabulary` |
 | Word Detail | `GET /api/vocabulary/:id`, `DELETE /api/vocabulary/:id`, `POST /api/vocabulary/:id/regenerate-ai` |
-| Review Session | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
+| Review | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
 | Review History | `GET /api/review/history` |
 
-Home is the default Dashboard tab in the bottom-navigation shell. Vocabulary Library
-and Word Detail are implemented; dashboard data, review, and history screens remain
-planned.
+Home is the default Dashboard tab in the four-tab bottom-navigation shell. All MVP
+screens are now implemented: Dashboard, Vocabulary Library, Word Detail, Review,
+Review Session, and Review History.
 
 ---
 
@@ -300,6 +300,9 @@ Current routes:
 | `AppRoutes.home` | `/` | `MainShellPage` on the Dashboard tab |
 | `AppRoutes.addWord` | `/add-word` | `AddWordsPage` with `AddWordBloc` |
 | `AppRoutes.vocabularyLibrary` | `/library` | `MainShellPage` on the Library tab |
+| `AppRoutes.review` | `/review` | `MainShellPage` on the Review tab |
+| `AppRoutes.reviewHistory` | `/history` | `MainShellPage` on the History tab |
+| `AppRoutes.reviewSession` | `/review-session` | `ReviewSessionPage` with `ReviewSessionBloc`; opens full-screen |
 | `AppRoutes.wordDetail` | `/word-detail` | `WordDetailPage` with `WordDetailBloc`; requires a `String` word id |
 
 Do not add a third-party routing package.
