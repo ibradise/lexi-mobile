@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entities/dashboard_data.dart';
+import '../bloc/dashboard_bloc.dart';
+import '../bloc/dashboard_event.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 import '../bloc/review_queue_bloc.dart';
@@ -21,20 +24,38 @@ class MainShellPage extends StatefulWidget {
 
 class _MainShellPageState extends State<MainShellPage> {
   late int _selectedIndex;
+  bool _dashboardRequested = false;
   bool _reviewQueueRequested = false;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex.clamp(0, 2);
-    if (_selectedIndex == 2) {
+    if (_selectedIndex == 0 || _selectedIndex == 2) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
         }
-        _loadReviewQueue();
+        switch (_selectedIndex) {
+          case 0:
+            _loadDashboard();
+          case 2:
+            _loadReviewQueue();
+        }
       });
     }
+  }
+
+  void _loadDashboard() {
+    if (_dashboardRequested) {
+      return;
+    }
+    _refreshDashboard();
+  }
+
+  void _refreshDashboard() {
+    _dashboardRequested = true;
+    context.read<DashboardBloc>().add(const LoadDashboard());
   }
 
   void _loadReviewQueue() {
@@ -56,8 +77,11 @@ class _MainShellPageState extends State<MainShellPage> {
       return;
     }
     setState(() => _selectedIndex = index);
-    if (index == 2) {
-      _loadReviewQueue();
+    switch (index) {
+      case 0:
+        _loadDashboard();
+      case 2:
+        _loadReviewQueue();
     }
   }
 
@@ -66,8 +90,33 @@ class _MainShellPageState extends State<MainShellPage> {
     if (!mounted) {
       return;
     }
+    _refreshDashboard();
     context.read<LibraryBloc>().add(const LoadLibrary());
     _refreshReviewQueue();
+  }
+
+  Future<void> _startReview() async {
+    await Navigator.pushNamed(context, AppRoutes.reviewSession);
+    if (!mounted) {
+      return;
+    }
+    _refreshDashboard();
+    _refreshReviewQueue();
+  }
+
+  Future<void> _openWeakestWord(WeakestWord word) async {
+    final deleted = await Navigator.pushNamed(
+      context,
+      AppRoutes.wordDetail,
+      arguments: word.wordId,
+    );
+    if (!mounted) {
+      return;
+    }
+    _refreshDashboard();
+    if (deleted == true) {
+      context.read<LibraryBloc>().add(const LoadLibrary());
+    }
   }
 
   @override
@@ -82,7 +131,15 @@ class _MainShellPageState extends State<MainShellPage> {
       child: Scaffold(
         body: IndexedStack(
           index: _selectedIndex,
-          children: const [HomePage(), LibraryPage(), ReviewPage()],
+          children: [
+            HomePage(
+              onAddWords: _openAddWord,
+              onStartReview: _startReview,
+              onOpenWord: _openWeakestWord,
+            ),
+            const LibraryPage(),
+            const ReviewPage(),
+          ],
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,

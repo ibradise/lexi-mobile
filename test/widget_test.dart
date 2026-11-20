@@ -83,6 +83,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Your vocabulary, learned.'), findsOneWidget);
+    expect(find.text('No words yet'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byKey(const Key('mainDashboardTab')), findsOneWidget);
     expect(find.byKey(const Key('mainLibraryTab')), findsOneWidget);

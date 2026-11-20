@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/di/injection.dart';
 import '../bloc/add_word_bloc.dart';
+import '../bloc/dashboard_bloc.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 import '../bloc/review_queue_bloc.dart';
@@ -67,6 +68,7 @@ abstract final class AppRouter {
     return MaterialPageRoute<void>(
       builder: (_) => MultiBlocProvider(
         providers: [
+          BlocProvider<DashboardBloc>(create: (_) => getIt<DashboardBloc>()),
           BlocProvider<LibraryBloc>(
             create: (_) => getIt<LibraryBloc>()..add(const LoadLibrary()),
           ),
