@@ -5,10 +5,14 @@ import '../../core/di/injection.dart';
 import '../bloc/add_word_bloc.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
+import '../bloc/review_queue_bloc.dart';
+import '../bloc/review_session_bloc.dart';
+import '../bloc/review_session_event.dart';
 import '../bloc/word_detail_bloc.dart';
 import '../bloc/word_detail_event.dart';
 import '../pages/add_words_page.dart';
 import '../pages/main_shell_page.dart';
+import '../pages/review_session_page.dart';
 import '../pages/word_detail_page.dart';
 import 'app_routes.dart';
 
@@ -19,6 +23,17 @@ abstract final class AppRouter {
         return _shellRoute(settings, initialIndex: 0);
       case AppRoutes.vocabularyLibrary:
         return _shellRoute(settings, initialIndex: 1);
+      case AppRoutes.review:
+        return _shellRoute(settings, initialIndex: 2);
+      case AppRoutes.reviewSession:
+        return MaterialPageRoute<void>(
+          builder: (_) => BlocProvider<ReviewSessionBloc>(
+            create: (_) =>
+                getIt<ReviewSessionBloc>()..add(const StartReviewSession()),
+            child: const ReviewSessionPage(),
+          ),
+          settings: settings,
+        );
       case AppRoutes.addWord:
         return MaterialPageRoute<void>(
           builder: (_) => BlocProvider<AddWordBloc>(
@@ -50,8 +65,15 @@ abstract final class AppRouter {
     required int initialIndex,
   }) {
     return MaterialPageRoute<void>(
-      builder: (_) => BlocProvider<LibraryBloc>(
-        create: (_) => getIt<LibraryBloc>()..add(const LoadLibrary()),
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider<LibraryBloc>(
+            create: (_) => getIt<LibraryBloc>()..add(const LoadLibrary()),
+          ),
+          BlocProvider<ReviewQueueBloc>(
+            create: (_) => getIt<ReviewQueueBloc>(),
+          ),
+        ],
         child: MainShellPage(initialIndex: initialIndex),
       ),
       settings: settings,
