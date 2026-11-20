@@ -12,6 +12,19 @@ Lexi mobile app — Flutter application for the Lexi vocabulary learning app.
 
 ---
 
+## SKILL PRECEDENCE (STRICT)
+
+Generic Dart/Flutter skills, including files under `.agents/skills/`, are reference
+material only. They **never** override project rules.
+
+- `AGENTS.md`, `docs/architecture.md`, `docs/api-contract.md`, `docs/screens.md`,
+  `docs/tasks.md`, and the PRD take precedence over every skill.
+- If a skill conflicts with a project rule, follow the project rule.
+- Do not adopt a skill's architecture, state management, routing package,
+  dependencies, or tooling without explicit user approval.
+
+---
+
 ## MANDATORY WORKFLOW (do not skip)
 
 ### Before Building
@@ -20,13 +33,16 @@ Lexi mobile app — Flutter application for the Lexi vocabulary learning app.
 3. Read `../prd/architecture.md` — system flow
 4. Read `docs/tasks.md` — what's next
 5. Read `docs/architecture.md` — current code structure
+6. Read `docs/api-contract.md` — exact backend request/response contract
+7. Read `docs/screens.md` — screen behavior and navigation
 
 ### After Building
-6. Update `docs/IMPLEMENTATION.md` — what was actually built
-7. Update `docs/architecture.md` — if code structure changed
-8. **STOP and ask the user** for approval before clearing `docs/tasks.md`
-9. After approval, clear `docs/tasks.md`
-10. Commit only if this repository has been initialized with git
+8. Update `docs/IMPLEMENTATION.md` — what was actually built
+9. Update `docs/architecture.md` — if code structure changed
+10. Update `docs/api-contract.md` — if the backend contract changed
+11. **STOP and ask the user** for approval before clearing `docs/tasks.md`
+12. After approval, clear `docs/tasks.md`
+13. Commit only if this repository has been initialized with git
 
 **DO NOT** clear `docs/tasks.md` automatically or immediately.
 **ALWAYS** wait for explicit user approval before clearing.

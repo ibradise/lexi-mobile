@@ -66,6 +66,18 @@ lib/
 No feature subfolders are used. If the app grows enough to justify them, the structure
 can be reorganized later.
 
+### Current Phase 2 files
+
+- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`
+- `domain/repositories/vocabulary_repository.dart`: single and bulk add interface
+- `domain/usecases/add_word.dart`, `add_words.dart`: trimmed input operations
+- `data/models/`: single-word, added-word, and bulk-result models
+- `data/datasources/vocabulary_remote_data_source.dart`: `POST /api/vocabulary`
+- `data/repositories/vocabulary_repository_impl.dart`: mapping and failure translation
+- `presentation/bloc/add_word_bloc.dart` with event and state files
+- `presentation/pages/home_page.dart`, `add_words_page.dart`
+- `presentation/navigation/`: home and `/add-word` routes
+
 ---
 
 ## Dependency Rule
@@ -160,6 +172,11 @@ AppFailure (sealed, implements Exception)
 
 ## API Integration
 
+> Endpoint-level request and response details live in
+> [`docs/api-contract.md`](api-contract.md). That file is canonical for payloads,
+> status codes, limits, and error codes. This section covers mobile integration
+> patterns only.
+
 - Production base URL: `https://lexi-backend-z0zy.onrender.com/api`
 - Override with `--dart-define=API_BASE_URL=...`
 - Android emulator: `http://10.0.2.2:3001/api`
@@ -250,11 +267,37 @@ Rules:
 
 ---
 
+## Screens
+
+Screen behavior, navigation, and endpoint usage live in
+[`docs/screens.md`](screens.md).
+
+| Screen | Primary endpoints |
+|--------|-------------------|
+| Home / Dashboard | `GET /api/dashboard` |
+| Add Words | `POST /api/vocabulary` |
+| Vocabulary Library | `GET /api/vocabulary` |
+| Word Detail | `GET /api/vocabulary/:id`, `DELETE /api/vocabulary/:id`, `POST /api/vocabulary/:id/regenerate-ai` |
+| Review Session | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
+| Review History | `GET /api/review/history` |
+
+Phase 2 currently implements Home as a landing screen and Add Words. Dashboard data,
+the library, detail, review, and history screens remain planned.
+
+---
+
 ## Navigation
 
 Navigation uses Flutter's built-in `Navigator` with centralized named routes.
 Route definitions and navigation helpers live in `presentation/navigation/`, using
 `onGenerateRoute` for typed route arguments.
+
+Current routes:
+
+| Constant | Path | Screen |
+|----------|------|--------|
+| `AppRoutes.home` | `/` | `HomePage` |
+| `AppRoutes.addWord` | `/add-word` | `AddWordsPage` with `AddWordBloc` |
 
 Do not add a third-party routing package.
 

@@ -8,6 +8,8 @@ Flutter client for Lexi, a personal vocabulary learning app.
 
 - `AGENTS.md` — development rules and architecture summary
 - `docs/architecture.md` — approved technical architecture
+- `docs/api-contract.md` — mobile-facing backend endpoint contract
+- `docs/screens.md` — screen behavior, navigation, and endpoint usage
 - `docs/tasks.md` — current implementation phase
 - `docs/IMPLEMENTATION.md` — implementation history
 
