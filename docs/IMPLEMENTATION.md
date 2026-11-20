@@ -113,3 +113,68 @@
 - AI readiness polling and retry live in the planned Library/Detail screens
 - Push and PR verification remain pending
 
+
+## 2026-11-20 — Phase 3: Vocabulary Library + Word Detail
+
+- [x] Added `LearningStatus`, `LearningState`, `WordSummary`, `WordDetail`, `AiContent`, `WordMeaning`, `WordExample`, and `ReviewEntry` domain types
+- [x] Added `VocabularyQuery` with search, status, backend-supported sorting, ordering, and pagination
+- [x] Extended `VocabularyRepository` and added `GetWords`, `GetWordDetail`, `DeleteWord`, and `RegenerateWordAi`
+- [x] Added list/detail models for summaries, learning state, AI content, reviews, and page metadata
+- [x] Added `GET /api/vocabulary` with search, status, sort, order, page, and limit
+- [x] Added `GET /api/vocabulary/:id`, `DELETE /api/vocabulary/:id`, and `POST /api/vocabulary/:id/regenerate-ai`
+- [x] Used the 15-second timeout for list/detail/delete and the 60-second AI timeout for regenerate
+- [x] Extended `VocabularyRepositoryImpl` with model-to-entity mapping and `AppFailure` translation
+- [x] Added `LibraryBloc` with load, search submit/clear, status filter, sort, clear filters, and load-more events
+- [x] Added `WordDetailBloc` with load, bounded polling, regenerate, and delete events
+- [x] Added `LibraryPage` with search, status chips, sort menu, word cards, pagination, empty, no-match, and error states
+- [x] Added `WordDetailPage` with AI content, learning state, source details, reviews, pending-AI actions, regenerate confirmation, and delete confirmation
+- [x] Added `/library` and the typed `/word-detail` route using the word id as the route argument
+- [x] Added a bottom-navigation `MainShellPage` with Dashboard and Library tabs and a shell-level Add word FAB
+- [x] Added shell-scoped `LibraryBloc` and route-scoped `WordDetailBloc` providers through GetIt factories
+- [x] Refreshed the library after Add Words and after a successful delete
+- [x] Added Phase 3 model, data source, repository, use case, bloc, and widget tests
+
+## Screens Implemented (mobile)
+
+- Dashboard/Home — default bottom-navigation tab with a dashboard placeholder and empty-activity guidance
+- Vocabulary Library — bottom-navigation tab with search, status filters, sort, paginated word cards, empty/no-match/error states
+- Word Detail — AI content, learning state, source, reviews, pending-AI polling, regenerate, and soft delete
+
+## API Integration
+
+- `GET /api/vocabulary` with `search`, `status`, `sort`, `order`, `page`, and `limit`; 15-second timeout
+- `GET /api/vocabulary/:id`; 15-second timeout
+- `DELETE /api/vocabulary/:id`; 15-second timeout; expects `{ id, isArchived: true }`
+- `POST /api/vocabulary/:id/regenerate-ai`; 60-second AI timeout
+- List pagination `meta` maps to `PaginatedResult<WordSummary>`; missing metadata is a parse failure
+- Pending AI detail polls at 3s, 6s, 12s, 20s, and 30s, then stops and offers manual retry/regenerate
+
+## Tests
+
+- Models: learning state, ready/pending summaries, AI content, reviews, and missing AI content
+- Remote data source: query filters, omitted empty filters, encoded ids, delete confirmation, regenerate, and missing pagination meta
+- Repository: page mapping, detail/regenerate mapping, delete delegation, and not-found translation
+- Use cases: search trimming, page/limit bounds, blank search clearing, and trimmed ids
+- `LibraryBloc`: load, empty page, search/filter/sort, pagination, and load failure
+- `WordDetailBloc`: ready, pending polling, exhausted polling, regenerate, delete, delete 404, not-found, action failure, and disposed-poll cancellation
+- Widgets: bottom navigation, tab switching, Add FAB navigation, library empty/populated/search states, row navigation, detail content, pending AI, and delete confirmation
+- Result: 93 tests pass
+
+## Verification
+
+- `dart format --output=none --set-exit-if-changed lib test` — no changes
+- `flutter analyze` — no issues
+- `flutter test` — 93 tests pass
+- `flutter build apk --debug` — succeeded
+- Build output: `build/app/outputs/flutter-apk/app-debug.apk`
+- No Android device or emulator was connected for a manual launch
+
+## Notes
+
+- No new dependencies were added
+- Dashboard is the default tab; Library uses the same bottom-navigation shell
+- The library uses page size 20 and explicit Load more pagination
+- Sorting is limited to newest, oldest, A–Z, and Z–A because the backend supports only `dateAdded` and `word`
+- Source URLs are selectable text; `url_launcher` is intentionally not added
+- Pending AI polling stops after the bounded schedule and exposes "Check again" and "Regenerate AI"
+- Phase 3 changes are committed on the feature branch and not yet pushed

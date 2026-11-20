@@ -93,11 +93,11 @@ Error:
 |---------|-------------|---------------|
 | Add one word | `POST /api/vocabulary` with `{ word, ... }` | Phase 2 |
 | Bulk add words | `POST /api/vocabulary` with `{ words: [...] }` | Phase 2 |
-| Library list / search / filter | `GET /api/vocabulary` | Planned |
-| Word detail | `GET /api/vocabulary/:id` | Planned |
+| Library list / search / filter | `GET /api/vocabulary` | Phase 3 |
+| Word detail | `GET /api/vocabulary/:id` | Phase 3 |
 | Review exercises | `GET /api/vocabulary/:id/exercises` | Planned |
-| Delete word | `DELETE /api/vocabulary/:id` | Planned |
-| Regenerate AI content | `POST /api/vocabulary/:id/regenerate-ai` | Planned |
+| Delete word | `DELETE /api/vocabulary/:id` | Phase 3 |
+| Regenerate AI content | `POST /api/vocabulary/:id/regenerate-ai` | Phase 3 |
 | Today's review queue | `GET /api/review/today` | Planned |
 | Submit a review answer | `POST /api/review/:wordId/submit` | Planned |
 | Review history | `GET /api/review/history` | Planned |

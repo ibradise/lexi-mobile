@@ -66,17 +66,17 @@ lib/
 No feature subfolders are used. If the app grows enough to justify them, the structure
 can be reorganized later.
 
-### Current Phase 2 files
+### Current implementation files
 
-- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`
-- `domain/repositories/vocabulary_repository.dart`: single and bulk add interface
-- `domain/usecases/add_word.dart`, `add_words.dart`: trimmed input operations
-- `data/models/`: single-word, added-word, and bulk-result models
-- `data/datasources/vocabulary_remote_data_source.dart`: `POST /api/vocabulary`
+- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`, `LearningStatus`, `LearningState`, `WordSummary`, `WordDetail`, `AiContent`, `WordMeaning`, `WordExample`, `ReviewEntry`, `VocabularyQuery`, `PaginatedResult`
+- `domain/repositories/vocabulary_repository.dart`: add, list, detail, delete, and regenerate-AI interface
+- `domain/usecases/`: `AddWord`, `AddWords`, `GetWords`, `GetWordDetail`, `DeleteWord`, `RegenerateWordAi`
+- `data/models/`: single-word, bulk-result, word summary/detail, learning state, AI content, review, and page models
+- `data/datasources/vocabulary_remote_data_source.dart`: vocabulary list, detail, delete, add, bulk add, and regenerate-AI endpoints
 - `data/repositories/vocabulary_repository_impl.dart`: mapping and failure translation
-- `presentation/bloc/add_word_bloc.dart` with event and state files
-- `presentation/pages/home_page.dart`, `add_words_page.dart`
-- `presentation/navigation/`: home and `/add-word` routes
+- `presentation/bloc/`: `AddWordBloc`, `LibraryBloc`, and `WordDetailBloc` with event and state files
+- `presentation/pages/`: `main_shell_page.dart`, `home_page.dart`, `add_words_page.dart`, `library_page.dart`, `word_detail_page.dart`
+- `presentation/navigation/`: shell, `/add-word`, `/library`, and `/word-detail` routes
 
 ---
 
@@ -215,8 +215,8 @@ the background.
 | `GET /api/vocabulary/:id/exercises` | `409 AI_NOT_READY` until ready |
 
 There is no terminal `FAILED` state. Words that exhaust background retries remain
-pending. The client should poll with backoff, then offer a retry through
-`POST /api/vocabulary/:id/regenerate-ai`.
+pending. `WordDetailBloc` polls at 3s, 6s, 12s, 20s, and 30s, then stops and offers
+manual "Check again" and regenerate actions.
 
 ---
 
@@ -281,8 +281,9 @@ Screen behavior, navigation, and endpoint usage live in
 | Review Session | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
 | Review History | `GET /api/review/history` |
 
-Phase 2 currently implements Home as a landing screen and Add Words. Dashboard data,
-the library, detail, review, and history screens remain planned.
+Home is the default Dashboard tab in the bottom-navigation shell. Vocabulary Library
+and Word Detail are implemented; dashboard data, review, and history screens remain
+planned.
 
 ---
 
@@ -296,8 +297,10 @@ Current routes:
 
 | Constant | Path | Screen |
 |----------|------|--------|
-| `AppRoutes.home` | `/` | `HomePage` |
+| `AppRoutes.home` | `/` | `MainShellPage` on the Dashboard tab |
 | `AppRoutes.addWord` | `/add-word` | `AddWordsPage` with `AddWordBloc` |
+| `AppRoutes.vocabularyLibrary` | `/library` | `MainShellPage` on the Library tab |
+| `AppRoutes.wordDetail` | `/word-detail` | `WordDetailPage` with `WordDetailBloc`; requires a `String` word id |
 
 Do not add a third-party routing package.
 
