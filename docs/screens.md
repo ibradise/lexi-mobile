@@ -6,19 +6,23 @@
 ## Navigation
 
 ```
-Home / Dashboard
-├── Add Words
-├── Vocabulary Library → Word Detail
-├── Review Session
-└── Review History
+Main shell (bottom navigation)
+├── Dashboard (default tab)
+├── Library → Word Detail
+├── Review → Review Session
+└── History
+
+Add Words is a pushed route opened from the shell-level Add word FAB.
+Review Session opens full-screen without the bottom navigation bar.
 ```
 
 ## 1. Home / Dashboard
 
 **Purpose:** Overview of progress and today's review load.
 
-**Current implementation:** Phase 2 renders a minimal landing screen with an Add
-Words CTA. Dashboard content is planned.
+**Current implementation:** The default tab inside the four-tab `MainShellPage`.
+Loads today's review counts, progress stats, the learning mix, and up to five weakest
+words from `GET /api/dashboard`. The empty-library state links to Add Words.
 
 **Endpoints:** `GET /api/dashboard`
 
@@ -27,7 +31,8 @@ Words CTA. Dashboard content is planned.
 - Stats: total words, status counts, reviews today, 7-day accuracy, streak
 - Up to 5 weakest words
 
-**Actions:** Start review, add words, open library, open review history.
+**Actions:** Start review when words are due, add words from the FAB or empty state,
+open a weakest word in Word Detail, refresh, and switch tabs.
 
 **States:** Loading; error with retry; empty library with an add-word CTA; populated.
 
@@ -63,6 +68,10 @@ Words CTA. Dashboard content is planned.
 
 **Endpoints:** `GET /api/vocabulary`
 
+**Current implementation:** The Library tab inside `MainShellPage`. Phase 3 library
+with 20-item pages, submit-only search, status chips, backend-supported sorting,
+word cards, and load-more pagination.
+
 **Content:**
 - Search field
 - Status filter: New, Learning, Familiar, Strong, Mastered
@@ -71,13 +80,18 @@ Words CTA. Dashboard content is planned.
 - Word rows with status and AI-ready/pending indicator
 - Pagination
 
-**Actions:** Search, filter, sort, paginate, open Word Detail.
+**Actions:** Search on submit, filter, sort, paginate, open Word Detail; use the shell
+Add word FAB to add more words.
 
-**States:** Loading; empty with add-word CTA; error with retry; populated.
+**States:** Loading; empty with add-word CTA; no matches with clear filters; initial
+error with retry; inline load-more error; populated.
 
 ## 4. Word Detail
 
 **Purpose:** View a word's full AI content and learning state.
+
+**Current implementation:** Phase 3 detail with AI content, learning state, source,
+recent reviews, bounded pending-AI polling, regenerate, and soft delete.
 
 **Endpoints:**
 - `GET /api/vocabulary/:id`
@@ -91,15 +105,24 @@ Words CTA. Dashboard content is planned.
 - Learning state and recent review history
 - AI pending or ready state
 
-**Actions:** Regenerate AI, delete word with confirmation, return to library.
+**Actions:** Check again, regenerate AI, delete word with confirmation, return to library.
 
-**States:** Loading; not found; AI pending; error with retry.
+**States:** Loading; not found; AI pending; polling exhausted; action error; deleted.
 
-**Rules:** Delete is a soft delete. Regenerate uses the 60-second AI timeout.
+**Rules:** Delete is a soft delete. Regenerate uses the 60-second AI timeout. Pending
+AI polls at 3s, 6s, 12s, 20s, and 30s, then stops. Source URLs are selectable text,
+not external links.
 
-## 5. Review Session
+## 5. Review
 
-**Purpose:** Review today's queue one exercise at a time.
+**Purpose:** Start and complete today's review queue.
+
+**Current implementation:** The Review tab lists today's counts and queue, including
+AI-pending items. Tapping Start review opens the full-screen Review Session. The
+session skips AI-pending words, shows one exercise per word, submits answers to the
+server, shows feedback, and finishes with a summary. Completing or closing a session
+refreshes the Review tab. The API returns up to three exercises per word; this first
+version uses the first exercise for each queue word.
 
 **Endpoints:**
 - `GET /api/review/today`
@@ -125,6 +148,11 @@ Words CTA. Dashboard content is planned.
 
 **Purpose:** Browse past review activity.
 
+**Current implementation:** The History tab loads the newest-first paginated review
+list (20 per page), shows result badges and timing/hint details, supports Load more,
+refreshes, and opens the reviewed word in Word Detail. The data layer and query support
+an optional `wordId` filter; no filter entry point is exposed yet.
+
 **Endpoints:** `GET /api/review/history`
 
 **Content:**
@@ -132,7 +160,7 @@ Words CTA. Dashboard content is planned.
 - Optional word filter
 - Pagination
 
-**Actions:** Paginate, filter by word, open Word Detail.
+**Actions:** Refresh, load more, and open Word Detail. Word filtering is supported by the data layer but not yet exposed in the UI.
 
 **States:** Loading; empty; error with retry; populated.
 

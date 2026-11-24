@@ -66,17 +66,17 @@ lib/
 No feature subfolders are used. If the app grows enough to justify them, the structure
 can be reorganized later.
 
-### Current Phase 2 files
+### Current implementation files
 
-- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`
-- `domain/repositories/vocabulary_repository.dart`: single and bulk add interface
-- `domain/usecases/add_word.dart`, `add_words.dart`: trimmed input operations
-- `data/models/`: single-word, added-word, and bulk-result models
-- `data/datasources/vocabulary_remote_data_source.dart`: `POST /api/vocabulary`
-- `data/repositories/vocabulary_repository_impl.dart`: mapping and failure translation
-- `presentation/bloc/add_word_bloc.dart` with event and state files
-- `presentation/pages/home_page.dart`, `add_words_page.dart`
-- `presentation/navigation/`: home and `/add-word` routes
+- `domain/entities/`: `VocabularyWord`, `AddedWord`, `BulkAddResult`, `AddWordParams`, `LearningStatus`, `LearningState`, `WordSummary`, `WordDetail`, `AiContent`, `WordMeaning`, `WordExample`, `ReviewEntry`, `VocabularyQuery`, `PaginatedResult`, `DashboardData`, `ReviewQueue`, `ReviewExercise`, `ReviewSubmission`, `ScoreBreakdown`, `ReviewSubmissionResult`, `ReviewHistoryItem`, `ReviewHistoryQuery`
+- `domain/repositories/`: `VocabularyRepository` for add/list/detail/delete/regenerate; `DashboardRepository` for dashboard data; `ReviewRepository` for today's queue, exercises, and submission
+- `domain/usecases/`: `AddWord`, `AddWords`, `GetWords`, `GetWordDetail`, `DeleteWord`, `RegenerateWordAi`, `GetDashboard`, `GetTodayReview`, `GetReviewExercises`, `GetReviewHistory`, `SubmitReview`
+- `data/models/`: single-word, bulk-result, word summary/detail, learning state, AI content, review, page, dashboard, review queue, review exercise, review history, and submission-result models
+- `data/datasources/`: `vocabulary_remote_data_source.dart` for vocabulary endpoints; `dashboard_remote_data_source.dart` for the dashboard; `review_remote_data_source.dart` for review queue, exercises, and submit
+- `data/repositories/`: `vocabulary_repository_impl.dart`, `dashboard_repository_impl.dart`, and `review_repository_impl.dart` for mapping and failure translation
+- `presentation/bloc/`: `AddWordBloc`, `DashboardBloc`, `LibraryBloc`, `WordDetailBloc`, `ReviewQueueBloc`, `ReviewSessionBloc`, and `ReviewHistoryBloc` with event and state files
+- `presentation/pages/`: `main_shell_page.dart`, `home_page.dart`, `add_words_page.dart`, `library_page.dart`, `word_detail_page.dart`, `review_page.dart`, `review_session_page.dart`, `review_history_page.dart`
+- `presentation/navigation/`: shell, `/add-word`, `/library`, `/review`, `/history`, `/review-session`, and `/word-detail` routes
 
 ---
 
@@ -215,8 +215,8 @@ the background.
 | `GET /api/vocabulary/:id/exercises` | `409 AI_NOT_READY` until ready |
 
 There is no terminal `FAILED` state. Words that exhaust background retries remain
-pending. The client should poll with backoff, then offer a retry through
-`POST /api/vocabulary/:id/regenerate-ai`.
+pending. `WordDetailBloc` polls at 3s, 6s, 12s, 20s, and 30s, then stops and offers
+manual "Check again" and regenerate actions.
 
 ---
 
@@ -278,11 +278,12 @@ Screen behavior, navigation, and endpoint usage live in
 | Add Words | `POST /api/vocabulary` |
 | Vocabulary Library | `GET /api/vocabulary` |
 | Word Detail | `GET /api/vocabulary/:id`, `DELETE /api/vocabulary/:id`, `POST /api/vocabulary/:id/regenerate-ai` |
-| Review Session | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
+| Review | `GET /api/review/today`, `GET /api/vocabulary/:id/exercises`, `POST /api/review/:wordId/submit` |
 | Review History | `GET /api/review/history` |
 
-Phase 2 currently implements Home as a landing screen and Add Words. Dashboard data,
-the library, detail, review, and history screens remain planned.
+Home is the default Dashboard tab in the four-tab bottom-navigation shell. All MVP
+screens are now implemented: Dashboard, Vocabulary Library, Word Detail, Review,
+Review Session, and Review History.
 
 ---
 
@@ -296,8 +297,13 @@ Current routes:
 
 | Constant | Path | Screen |
 |----------|------|--------|
-| `AppRoutes.home` | `/` | `HomePage` |
+| `AppRoutes.home` | `/` | `MainShellPage` on the Dashboard tab |
 | `AppRoutes.addWord` | `/add-word` | `AddWordsPage` with `AddWordBloc` |
+| `AppRoutes.vocabularyLibrary` | `/library` | `MainShellPage` on the Library tab |
+| `AppRoutes.review` | `/review` | `MainShellPage` on the Review tab |
+| `AppRoutes.reviewHistory` | `/history` | `MainShellPage` on the History tab |
+| `AppRoutes.reviewSession` | `/review-session` | `ReviewSessionPage` with `ReviewSessionBloc`; opens full-screen |
+| `AppRoutes.wordDetail` | `/word-detail` | `WordDetailPage` with `WordDetailBloc`; requires a `String` word id |
 
 Do not add a third-party routing package.
 
